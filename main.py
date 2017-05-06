@@ -39,6 +39,7 @@ with open(prefix_org, 'r') as f:
 with open(prefix_person, 'r') as f:
     prefix_person = read_format(f)
 
+# trainer_files = ["./train/98JUL5_2.txt"]
 for trainer in trainer_files:
     with open(trainer, "r") as f:
         data = filter(lambda x: x != "\r\n" and x != " ", f.read().split('|'))
@@ -46,13 +47,13 @@ for trainer in trainer_files:
     for _data in data:
         row = list()
         row.append(_data)
-        row.append(_data in common_dict)
-        row.append(_data in name_dict)
+        row.append(1 if _data in common_dict else 0)
+        row.append(1 if _data in name_dict else 0)
         check_org = _data in prefix_org
         w27_prefix_org = 7 if check_org else w27_prefix_org - 1
-        row.append(check_org)
-        row.append(_data in prefix_person)
-        row.append(True if w27_prefix_org > 1 else False)
+        row.append(1 if check_org else 0)
+        row.append(1 if _data in prefix_person else 0)
+        row.append(1 if w27_prefix_org > 1 else 0)
         matched = expr.match(_data)
         if matched:
             word = matched.group(1)
@@ -65,6 +66,14 @@ for trainer in trainer_files:
         if w27_prefix_org < 0:
             w27_prefix_org = 0
 
+# if want True False
+"""
 with open("trainer.ctf", "w") as f:
     for _learner in learner:
         f.write(" ".join([ str(__learner) if type(__learner) == bool else __learner for __learner in _learner]) + "\n")
+"""
+
+# if want 0 1
+with open("trainer.crf", "w") as f:
+    for _learner in learner:
+        f.write(" ".join([ str(__learner) for __learner in _learner ]) + "\n")
