@@ -17,7 +17,7 @@ def convert_to_utf(filenames):
 def read_format(f):
     return [ _data.rstrip() for _data in f.readlines() ]
 
-expr = re.compile(r'(.*?)\((per_start|per_cont|per_end|org_start|org_cont|org_end|per|org)\)')
+expr = re.compile(r'(.*?)\((per_start|per_cont|per_end|org_start|org_cont|org_end|per|org|loc_start|loc_cont|loc_end|loc)\)')
 taboo = ["org", "per", "loc"]
 trainer_files = glob.glob("./train/*")
 person_files = glob.glob("./dictionary/person/*")
@@ -46,6 +46,7 @@ for trainer in trainer_files:
 
     for _data in data:
         row = list()
+        _data = _data.replace("\r\n", "").replace(" ", "").replace("\n", "")
         row.append(_data)
         row.append(1 if _data in common_dict else 0)
         row.append(1 if _data in name_dict else 0)
@@ -57,9 +58,15 @@ for trainer in trainer_files:
         matched = expr.match(_data)
         if matched:
             word = matched.group(1)
+            if word == " " or word == "":
+                w27_prefix_org += 1
+                continue
             _class = matched.group(2)
             row[0] = word
-            row.append(_class.upper())
+            if "loc" in _class:
+                row.append("OTHER")
+            else:
+                row.append(_class.upper())
         else:
             row.append("OTHER")
         learner.append(row)
