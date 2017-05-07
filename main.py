@@ -42,7 +42,7 @@ with open(prefix_person, 'r') as f:
 # trainer_files = ["./train/98JUL5_2.txt"]
 for trainer in trainer_files:
     with open(trainer, "r") as f:
-        data = filter(lambda x: x != "\r\n" and x != " ", f.read().split('|'))
+        data = filter(lambda x: x != "\r\n" and x != " " and x != "", f.read().split('|'))
 
     for _data in data:
         row = list()
