@@ -69,9 +69,7 @@ for trainer in trainer_files:
                 continue
             _class = matched.group(2)
             row[0] = _data
-            if "loc" in _class:
-                row.append("OTHER")
-            else:
+            if not ("loc" in _class):
                 mem_class = _class.upper()
         row.append(1 if _data in common_dict else 0)
         row.append(1 if _data in name_dict else 0)
