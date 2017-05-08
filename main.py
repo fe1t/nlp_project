@@ -17,6 +17,16 @@ def convert_to_utf(filenames):
 def read_format(f):
     return [ _data.rstrip() for _data in f.readlines() ]
 
+def cycle_list(start, prefix_checklist):
+    start = (start - 7) % 8
+    end = (start - 2) % 8
+    ans = list()
+    while start != end:
+        ans.append(prefix_checklist[start])
+        start = (start + 1) % 8
+    ans.append(prefix_checklist[end])
+    return ans
+
 expr = re.compile(r'(.*?)\((per_start|per_cont|per_end|org_start|org_cont|org_end|per|org|loc_start|loc_cont|loc_end|loc)\)')
 taboo = ["org", "per", "loc"]
 trainer_files = glob.glob("./train/*")
@@ -29,7 +39,10 @@ common_dict = common_files[2]
 name_dict = person_files[6]
 prefix_org = org_files[15]
 prefix_person = person_files[-1]
-w27_prefix_org = 0
+# w27_prefix_org = 0
+w27_prefix_org = [0, 0, 0, 0, 0, 0, 0, 0]
+count = 0
+
 with open(common_dict, 'r') as f:
     common_dict = read_format(f)
 with open(name_dict, 'r') as f:
@@ -48,30 +61,35 @@ for trainer in trainer_files:
         row = list()
         _data = _data.replace("\r\n", "").replace(" ", "").replace("\n", "")
         row.append(_data)
-        row.append(1 if _data in common_dict else 0)
-        row.append(1 if _data in name_dict else 0)
-        check_org = _data in prefix_org
-        w27_prefix_org = 7 if check_org else w27_prefix_org - 1
-        row.append(1 if check_org else 0)
-        row.append(1 if _data in prefix_person else 0)
-        row.append(1 if w27_prefix_org > 1 else 0)
+        mem_class = "OTHER"
         matched = expr.match(_data)
         if matched:
-            word = matched.group(1)
-            if word == " " or word == "":
-                w27_prefix_org += 1
+            _data = matched.group(1)
+            if _data == " " or _data == "":
                 continue
             _class = matched.group(2)
-            row[0] = word
+            row[0] = _data
             if "loc" in _class:
                 row.append("OTHER")
             else:
-                row.append(_class.upper())
+                mem_class = _class.upper()
+        row.append(1 if _data in common_dict else 0)
+        row.append(1 if _data in name_dict else 0)
+        # check_org = _data in prefix_org
+        # backup_w27_prefix_org = w27_prefix_org
+        # w27_prefix_org = 7 if check_org else w27_prefix_org - 1
+        if _data in prefix_org:
+            w27_prefix_org[count] = 1
+            row.append(1)
         else:
-            row.append("OTHER")
+            w27_prefix_org[count] = 0
+            row.append(0)
+        # row.append(1 if _data in prefix_org else 0)
+        row.append(1 if _data in prefix_person else 0)
+        row.append(1 if 1 in cycle_list(count, w27_prefix_org) else 0)
+        row.append(mem_class)
         learner.append(row)
-        if w27_prefix_org < 0:
-            w27_prefix_org = 0
+        count = (count + 1) % 8
 
 # if want True False
 """
