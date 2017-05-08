@@ -35,10 +35,10 @@ org_files = glob.glob("./dictionary/org/*")
 common_files = glob.glob("./dictionary/common/*")
 # convert_to_utf(common_files)
 learner = list()
-common_dict = common_files[2]
-name_dict = person_files[6]
-prefix_org = org_files[15]
-prefix_person = person_files[-1]
+common_dict = "./dictionary/common/common_dict.txt"
+name_dict = "./dictionary/person/name.txt"
+prefix_org = "./dictionary/org/org_prefix.txt"
+prefix_person = "./dictionary/person/prefix_person.txt"
 # w27_prefix_org = 0
 w27_prefix_org = [0, 0, 0, 0, 0, 0, 0, 0]
 count = 0
